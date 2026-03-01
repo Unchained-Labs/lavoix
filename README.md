@@ -1,5 +1,7 @@
 # lavoix
 
+[![CI](https://github.com/Unchained-Labs/lavoix/actions/workflows/ci.yml/badge.svg)](https://github.com/Unchained-Labs/lavoix/actions/workflows/ci.yml)
+
 `lavoix` is a Python library + FastAPI server for speech workflows:
 
 - **Speech-to-Text (STT):** Voxtral-first via Mistral API
@@ -92,6 +94,12 @@ client.synthesize("Bonjour Erwin", "out.wav")
 - `GET /healthz`
 - `POST /v1/stt/transcribe` (multipart form: `file`, optional `language`, optional `provider`)
 - `POST /v1/tts/synthesize` (JSON body: `text`, `voice`, `speed`, optional `provider`)
+
+## Integration With Otter/Seal
+
+- Otter forwards voice prompts to Lavoix for transcription.
+- Seal consumes that flow through Otter (`POST /v1/voice/prompts`) and keeps voice-first task creation.
+- Lavoix can also be used standalone as a generic STT/TTS service.
 
 ## Quality Gates
 
