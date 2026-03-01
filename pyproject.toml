@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lavoix"
+version = "0.1.0"
+description = "STT/TTS library and server with Voxtral-first architecture"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Unchained Labs" }]
+dependencies = [
+  "fastapi>=0.112.0",
+  "httpx>=0.27.0",
+  "pydantic>=2.8.0",
+  "pydantic-settings>=2.4.0",
+  "python-multipart>=0.0.9",
+  "uvicorn[standard]>=0.30.0"
+]
+
+[project.optional-dependencies]
+stt-oss = ["faster-whisper>=1.0.3"]
+tts-oss = ["pyttsx3>=2.90"]
+dev = [
+  "pre-commit>=3.8.0",
+  "pytest>=8.2.0",
+  "pytest-asyncio>=0.23.8",
+  "ruff>=0.6.0"
+]
+
+[project.scripts]
+lavoix-server = "lavoix.api:run"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
