@@ -52,7 +52,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             raise HTTPException(status_code=500, detail=str(exc)) from exc
 
     @app.post("/v1/tts/synthesize")
-    async def synthesize(payload: SynthesisRequest, audio_service: AudioService = Depends(get_service)):
+    async def synthesize(
+        payload: SynthesisRequest, audio_service: AudioService = Depends(get_service)
+    ):
         try:
             metadata, audio = await audio_service.synthesize(
                 text=payload.text,

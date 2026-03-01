@@ -19,7 +19,7 @@ class AudioService:
     tts_providers: dict[str, TtsProvider]
 
     @classmethod
-    def from_settings(cls, settings: Settings) -> "AudioService":
+    def from_settings(cls, settings: Settings) -> AudioService:
         stt_providers: dict[str, SttProvider] = {"faster-whisper": FasterWhisperSttProvider()}
         tts_providers: dict[str, TtsProvider] = {"oss": Pyttsx3TtsProvider()}
 

@@ -93,6 +93,19 @@ client.synthesize("Bonjour Erwin", "out.wav")
 - `POST /v1/stt/transcribe` (multipart form: `file`, optional `language`, optional `provider`)
 - `POST /v1/tts/synthesize` (JSON body: `text`, `voice`, `speed`, optional `provider`)
 
+## Quality Gates
+
+- Pre-commit config is included in `.pre-commit-config.yaml`.
+- GitHub Actions CI runs lint/format checks and tests on push/PR.
+
+Enable hooks locally:
+
+```bash
+pip install -e ".[dev]"
+pre-commit install
+pre-commit run --all-files
+```
+
 ## Notes
 
 - If Mistral API key is missing, `mistral` STT/TTS providers are unavailable; use `faster-whisper` for STT and `oss` for TTS.

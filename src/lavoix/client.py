@@ -7,7 +7,9 @@ import httpx
 
 
 class LavoixClient:
-    def __init__(self, base_url: str = "http://localhost:8090", timeout_seconds: float = 120.0) -> None:
+    def __init__(
+        self, base_url: str = "http://localhost:8090", timeout_seconds: float = 120.0
+    ) -> None:
         self._base_url = base_url.rstrip("/")
         self._timeout = timeout_seconds
 
@@ -48,8 +50,15 @@ class LavoixClient:
         speed: float = 1.0,
         provider: str | None = None,
     ) -> Path:
-        payload: dict[str, Any] = {"text": text, "voice": voice, "speed": speed, "provider": provider}
-        response = httpx.post(f"{self._base_url}/v1/tts/synthesize", json=payload, timeout=self._timeout)
+        payload: dict[str, Any] = {
+            "text": text,
+            "voice": voice,
+            "speed": speed,
+            "provider": provider,
+        }
+        response = httpx.post(
+            f"{self._base_url}/v1/tts/synthesize", json=payload, timeout=self._timeout
+        )
         response.raise_for_status()
 
         destination = Path(output_path)

@@ -23,7 +23,9 @@ class MistralVoxtralTtsProvider(TtsProvider):
             "format": "wav",
         }
         async with httpx.AsyncClient(timeout=120.0) as client:
-            response = await client.post(f"{self._base_url}/audio/speech", headers=headers, json=payload)
+            response = await client.post(
+                f"{self._base_url}/audio/speech", headers=headers, json=payload
+            )
             response.raise_for_status()
             content_type = response.headers.get("content-type", "audio/wav")
             return response.content, content_type
