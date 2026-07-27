@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import tempfile
+import threading
 from pathlib import Path
 
 from lavoix.schemas import TranscriptionResult
@@ -15,17 +16,24 @@ class FasterWhisperSttProvider(SttProvider):
     def __init__(self, model: str = "small") -> None:
         self._model_name = model
         self._model = None
+        self._model_lock = threading.Lock()
 
     def _ensure_model(self):
         if self._model is not None:
             return self._model
-        try:
-            from faster_whisper import WhisperModel
-        except ImportError as exc:  # pragma: no cover - depends on optional extras
-            raise RuntimeError(
-                "faster-whisper is not installed. Install with `pip install lavoix[stt-oss]`."
-            ) from exc
-        self._model = WhisperModel(self._model_name)
+        # Transcriptions run on the thread pool, so concurrent first requests can
+        # reach this together and each load a full copy of the weights. Double-check
+        # under a lock so exactly one load happens.
+        with self._model_lock:
+            if self._model is not None:
+                return self._model
+            try:
+                from faster_whisper import WhisperModel
+            except ImportError as exc:  # pragma: no cover - depends on optional extras
+                raise RuntimeError(
+                    "faster-whisper is not installed. Install with `pip install lavoix[stt-oss]`."
+                ) from exc
+            self._model = WhisperModel(self._model_name)
         return self._model
 
     def _transcribe_blocking(self, file_path: Path, language: str | None) -> TranscriptionResult:

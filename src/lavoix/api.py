@@ -8,7 +8,7 @@ from fastapi.responses import Response
 
 from lavoix.config import Settings
 from lavoix.schemas import SynthesisRequest
-from lavoix.service import AudioService
+from lavoix.service import AudioService, UnknownProviderError
 
 logger = logging.getLogger("lavoix.api")
 
@@ -23,8 +23,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return app.state.audio_service
 
     @app.get("/healthz")
-    async def healthz() -> dict[str, str]:
-        return {"status": "ok"}
+    async def healthz(audio_service: AudioService = Depends(get_service)) -> dict:
+        # Reporting the resolved provider sets makes it possible to tell a healthy
+        # server with no Mistral key from one that is fully configured.
+        return {
+            "status": "ok",
+            "providers": audio_service.available_providers(),
+            "defaults": {
+                "stt": app_settings.default_stt_provider,
+                "tts": app_settings.default_tts_provider,
+            },
+        }
 
     @app.post("/v1/stt/transcribe")
     async def transcribe(
@@ -47,6 +56,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             return result
         except HTTPException:
             raise
+        except UnknownProviderError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
         except Exception as exc:
             logger.exception("Transcription failed")
             raise HTTPException(status_code=500, detail=str(exc)) from exc
@@ -64,6 +75,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             )
             headers = {"X-Lavoix-Provider": metadata.provider}
             return Response(content=audio, media_type=metadata.content_type, headers=headers)
+        except UnknownProviderError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
         except Exception as exc:
             logger.exception("Synthesis failed")
             raise HTTPException(status_code=500, detail=str(exc)) from exc
