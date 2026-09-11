@@ -20,7 +20,13 @@ class AudioService:
 
     @classmethod
     def from_settings(cls, settings: Settings) -> AudioService:
-        stt_providers: dict[str, SttProvider] = {"faster-whisper": FasterWhisperSttProvider()}
+        stt_providers: dict[str, SttProvider] = {
+            "faster-whisper": FasterWhisperSttProvider(
+                model=settings.whisper_model,
+                device=settings.whisper_device,
+                compute_type=settings.whisper_compute_type,
+            )
+        }
         tts_providers: dict[str, TtsProvider] = {"oss": Pyttsx3TtsProvider()}
 
         if settings.mistral_api_key:
