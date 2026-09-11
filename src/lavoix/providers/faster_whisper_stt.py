@@ -12,8 +12,11 @@ from .base import SttProvider
 class FasterWhisperSttProvider(SttProvider):
     name = "faster-whisper"
 
-    def __init__(self, model: str = "small") -> None:
+    def __init__(self, model: str = "small", device: str = "cpu",
+                 compute_type: str = "int8") -> None:
         self._model_name = model
+        self._device = device
+        self._compute_type = compute_type
         self._model = None
 
     def _ensure_model(self):
@@ -25,7 +28,9 @@ class FasterWhisperSttProvider(SttProvider):
             raise RuntimeError(
                 "faster-whisper is not installed. Install with `pip install lavoix[stt-oss]`."
             ) from exc
-        self._model = WhisperModel(self._model_name)
+        self._model = WhisperModel(
+            self._model_name, device=self._device, compute_type=self._compute_type
+        )
         return self._model
 
     def _transcribe_blocking(self, file_path: Path, language: str | None) -> TranscriptionResult:

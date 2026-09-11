@@ -6,3 +6,9 @@ __pycache__/
 dist/
 build/
 *.egg-info/
+.env
+
+# Deployment-specific, not upstream's business. chezmoi's box moves the
+# published port off 8090 (its dashboard owns that) and attaches this to a
+# shared docker network. Another deployment will want different answers.
+docker-compose.override.yml
